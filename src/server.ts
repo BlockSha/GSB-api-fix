@@ -2,6 +2,8 @@ import express, { type Application, type Request, type Response } from 'express'
 import cors from 'cors';
 import dotenv from 'dotenv';
 import { Database } from './config/database.js';
+import { helmetMiddleware } from './middleware/helmet.middleware.js';
+import { rateLimiter } from './middleware/rateLimiter.middleware.js';
 import visiteurRoutes from './routes/visiteur.routes.js';
 import praticienRoutes from './routes/praticien.routes.js';
 import visiteRoutes from './routes/visite.routes.js';
@@ -37,14 +39,20 @@ class App {
    * Configure les middlewares Express
    */
   private initializeMiddlewares(): void {
+    // Applique Helmet en premier pour sécuriser les en-têtes HTTP
+    this.app.use(helmetMiddleware);
+
     // Parse le JSON dans les requêtes
     this.app.use(express.json());
-   
+
     // Parse les données URL-encoded
     this.app.use(express.urlencoded({ extended: true }));
-   
+
     // Active CORS pour toutes les origines
     this.app.use(cors());
+
+    // Applique le rate limiter à toutes les routes
+    this.app.use(rateLimiter);
   }
 
 
