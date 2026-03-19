@@ -1,14 +1,17 @@
 import mongoose, { Document, Schema } from 'mongoose';
+import bcrypt from 'bcrypt';
 
 export interface IVisiteur extends Document {
   nom: string;
   prenom: string;
   tel: string;
   email: string;
+  password: string;
   date_embauche: Date;
   portefeuillePraticiens: mongoose.Types.ObjectId[];
   createdAt: Date;
   updatedAt: Date;
+  comparePassword(candidatePassword: string): Promise<boolean>;
 }
 
 const visiteurSchema = new Schema<IVisiteur>(
@@ -36,6 +39,11 @@ const visiteurSchema = new Schema<IVisiteur>(
       trim: true,
       match: [/^\S+@\S+\.\S+$/, 'Email invalide']
     },
+    password: {
+      type: String,
+      required: [true, 'Le mot de passe est requis'],
+      minlength: [8, 'Le mot de passe doit contenir au moins 8 caractères']
+    },
     date_embauche: {
       type: Date,
       required: [true, 'La date d\'embauche est requise']
@@ -52,6 +60,18 @@ const visiteurSchema = new Schema<IVisiteur>(
     toObject: { virtuals: true }
   }
 );
+
+// Hash du mot de passe avant sauvegarde
+visiteurSchema.pre('save', async function (next) {
+  if (!this.isModified('password')) return next();
+  this.password = await bcrypt.hash(this.password, 10);
+  next();
+});
+
+// Méthode de comparaison du mot de passe
+visiteurSchema.methods.comparePassword = async function (candidatePassword: string): Promise<boolean> {
+  return bcrypt.compare(candidatePassword, this.password);
+};
 
 // Virtual pour les visites
 visiteurSchema.virtual('visites', {

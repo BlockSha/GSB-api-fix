@@ -9,6 +9,7 @@ import praticienRoutes from './routes/praticien.routes.js';
 import visiteRoutes from './routes/visite.routes.js';
 import motifRoutes from './routes/motif.routes.js';
 import portefeuilleRoutes from './routes/portefeuille.routes.js';
+import authRoutes from './routes/auth.routes.js';
 
 
 // Chargement des variables d'environnement
@@ -71,7 +72,8 @@ class App {
           praticiens: '/api/praticiens',
           visites: '/api/visites',
           motifs: '/api/motifs',
-          portefeuille: '/api/portefeuille'
+          portefeuille: '/api/portefeuille',
+          auth: '/api/auth'
         }
       });
     });
@@ -92,6 +94,7 @@ class App {
     this.app.use('/api/visites', visiteRoutes);
     this.app.use('/api/motifs', motifRoutes);
     this.app.use('/api/portefeuille', portefeuilleRoutes);
+    this.app.use('/api/auth', authRoutes);
   }
 
 

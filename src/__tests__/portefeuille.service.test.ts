@@ -4,6 +4,7 @@ jest.mock('../models/Portefeuille', () => ({
     findOne: jest.fn(),
     findOneAndUpdate: jest.fn(),
     findOneAndDelete: jest.fn(),
+    countDocuments: jest.fn(),
   }),
 }));
 
@@ -197,6 +198,66 @@ describe('PortefeuilleService', () => {
       await expect(service.removePraticien(VISITEUR_ID, PRATICIEN_ID)).rejects.toThrow(
         'Relation introuvable dans le portefeuille'
       );
+    });
+  });
+
+  // =========================================================
+  describe('getNombrePortefeuille', () => {
+    test('retourne le nombre total de praticiens dans le portefeuille', async () => {
+      // ARRANGE
+      (Portefeuille.countDocuments as jest.Mock).mockResolvedValue(5);
+
+      // ACT
+      const result = await service.getNombrePortefeuille(VISITEUR_ID);
+
+      // ASSERT
+      expect(result).toBe(5);
+      expect(Portefeuille.countDocuments).toHaveBeenCalledWith({ visiteur: VISITEUR_ID });
+    });
+
+    test('retourne 0 si le portefeuille est vide', async () => {
+      // ARRANGE
+      (Portefeuille.countDocuments as jest.Mock).mockResolvedValue(0);
+
+      // ACT
+      const result = await service.getNombrePortefeuille(VISITEUR_ID);
+
+      // ASSERT
+      expect(result).toBe(0);
+    });
+
+    test('lance une erreur si ID visiteur invalide', async () => {
+      await expect(service.getNombrePortefeuille(INVALID_ID)).rejects.toThrow('ID visiteur invalide');
+    });
+  });
+
+  // =========================================================
+  describe('getNombrePortefeuilleActif', () => {
+    test('retourne le nombre de praticiens actifs dans le portefeuille', async () => {
+      // ARRANGE
+      (Portefeuille.countDocuments as jest.Mock).mockResolvedValue(3);
+
+      // ACT
+      const result = await service.getNombrePortefeuilleActif(VISITEUR_ID);
+
+      // ASSERT
+      expect(result).toBe(3);
+      expect(Portefeuille.countDocuments).toHaveBeenCalledWith({ visiteur: VISITEUR_ID, actif: true });
+    });
+
+    test('retourne 0 si aucun praticien actif', async () => {
+      // ARRANGE
+      (Portefeuille.countDocuments as jest.Mock).mockResolvedValue(0);
+
+      // ACT
+      const result = await service.getNombrePortefeuilleActif(VISITEUR_ID);
+
+      // ASSERT
+      expect(result).toBe(0);
+    });
+
+    test('lance une erreur si ID visiteur invalide', async () => {
+      await expect(service.getNombrePortefeuilleActif(INVALID_ID)).rejects.toThrow('ID visiteur invalide');
     });
   });
 

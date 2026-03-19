@@ -1,4 +1,5 @@
 import express from 'express';
+import jwt from 'jsonwebtoken';
 import { Visiteur } from '../models/Visiteur.js';
 import { VisiteurService } from '../services/visiteur.service.js';
 
@@ -11,6 +12,78 @@ export class VisiteurController {
   constructor() {
     this.visiteurService = new VisiteurService();
   }
+  /**
+   * Inscription d'un nouveau visiteur
+   */
+  async signup(req: express.Request, res: express.Response): Promise<void> {
+    try {
+      const { nom, prenom, tel, email, password, date_embauche } = req.body;
+
+      const existingVisiteur = await Visiteur.findOne({ email });
+      if (existingVisiteur) {
+        res.status(400).json({ message: 'Un visiteur avec cet email existe déjà' });
+        return;
+      }
+
+      const visiteur = await Visiteur.create({ nom, prenom, tel, email, password, date_embauche });
+
+      const token = jwt.sign(
+        { userId: visiteur._id, role: 'visiteur' },
+        process.env.JWT_SECRET as string,
+        { expiresIn: '24h', algorithm: 'HS256' }
+      );
+
+      res.status(201).json({
+        message: 'Compte créé avec succès',
+        token,
+        visiteur: { id: visiteur._id, nom: visiteur.nom, prenom: visiteur.prenom, email: visiteur.email }
+      });
+    } catch (error) {
+      res.status(400).json({
+        message: 'Erreur lors de l\'inscription',
+        error: error instanceof Error ? error.message : 'Erreur inconnue'
+      });
+    }
+  }
+
+  /**
+   * Connexion d'un visiteur
+   */
+  async login(req: express.Request, res: express.Response): Promise<void> {
+    try {
+      const { email, password } = req.body;
+
+      const visiteur = await Visiteur.findOne({ email });
+      if (!visiteur) {
+        res.status(401).json({ message: 'Email ou mot de passe incorrect' });
+        return;
+      }
+
+      const isMatch = await visiteur.comparePassword(password);
+      if (!isMatch) {
+        res.status(401).json({ message: 'Email ou mot de passe incorrect' });
+        return;
+      }
+
+      const token = jwt.sign(
+        { userId: visiteur._id, role: 'visiteur' },
+        process.env.JWT_SECRET as string,
+        { expiresIn: '24h', algorithm: 'HS256' }
+      );
+
+      res.status(200).json({
+        message: 'Connexion réussie',
+        token,
+        visiteur: { id: visiteur._id, nom: visiteur.nom, prenom: visiteur.prenom, email: visiteur.email }
+      });
+    } catch (error) {
+      res.status(500).json({
+        message: 'Erreur lors de la connexion',
+        error: error instanceof Error ? error.message : 'Erreur inconnue'
+      });
+    }
+  }
+
   /**
    * Récupère tous les visiteurs
    * Sécurité: Retourne uniquement _id, nom, prénom, email, tel

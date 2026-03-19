@@ -139,6 +139,22 @@ export class PortefeuilleService {
       .sort({ date_ajout: -1 });
   }
 
+  public async getNombrePortefeuille(visiteurId: string): Promise<number> {
+    if (!Types.ObjectId.isValid(visiteurId)) {
+      throw new Error('ID visiteur invalide');
+    }
+
+    return await Portefeuille.countDocuments({ visiteur: visiteurId });
+  }
+
+  public async getNombrePortefeuilleActif(visiteurId: string): Promise<number> {
+    if (!Types.ObjectId.isValid(visiteurId)) {
+      throw new Error('ID visiteur invalide');
+    }
+
+    return await Portefeuille.countDocuments({ visiteur: visiteurId, actif: true });
+  }
+
   public async deleteRelation(visiteurId: string, praticienId: string): Promise<void> {
     if (!Types.ObjectId.isValid(visiteurId)) {
       throw new Error('ID visiteur invalide');
