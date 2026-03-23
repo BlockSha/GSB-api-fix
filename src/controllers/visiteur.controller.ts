@@ -26,7 +26,7 @@ export class VisiteurController {
       }
 
       const visiteur = await Visiteur.create({ nom, prenom, tel, email, password, date_embauche });
-
+      
       const token = jwt.sign(
         { userId: visiteur._id, role: 'visiteur' },
         process.env.JWT_SECRET as string,
