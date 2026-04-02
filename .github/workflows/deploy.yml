@@ -12,13 +12,17 @@ jobs:
     - name: Checkout source code
       uses: actions/checkout@v2
 
-    - name: Generate deployment package
+    - name: Setup Node.js
       uses: actions/setup-node@v4
-      with: node-version: '20'
-      run: npm ci
-      run: npm run build
-      run: npm test – –verbose
-      run: zip -r deploy.zip . -x '*.git*'
+      with:
+        node-version: '20'
+
+    - name: Generate deployment package
+      run: |
+        npm ci
+        npm run build
+        npm test -- --verbose
+        zip -r deploy.zip . -x '*.git*'
 
     - name: Deploy to EB
       uses: einaregilsson/beanstalk-deploy@v22
@@ -29,6 +33,5 @@ jobs:
         application_name: GSB
         environment_name: GSB-env
         version_label: ${{ github.sha }}-${{ github.run_number }}
-        version_label: 12345
         region: eu-east-1
         deployment_package: deploy.zip
