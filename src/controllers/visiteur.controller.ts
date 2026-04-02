@@ -3,18 +3,13 @@ import jwt from 'jsonwebtoken';
 import { Visiteur } from '../models/Visiteur.js';
 import { VisiteurService } from '../services/visiteur.service.js';
 
-/**
- * Controller pour gérer les opérations CRUD sur les visiteurs
- */
 export class VisiteurController {
   private visiteurService: VisiteurService;
 
   constructor() {
     this.visiteurService = new VisiteurService();
   }
-  /**
-   * Inscription d'un nouveau visiteur
-   */
+
   async signup(req: express.Request, res: express.Response): Promise<void> {
     try {
       const { nom, prenom, tel, email, password, date_embauche } = req.body;
@@ -46,9 +41,6 @@ export class VisiteurController {
     }
   }
 
-  /**
-   * Connexion d'un visiteur
-   */
   async login(req: express.Request, res: express.Response): Promise<void> {
     try {
       const { email, password } = req.body;
@@ -84,10 +76,6 @@ export class VisiteurController {
     }
   }
 
-  /**
-   * Récupère tous les visiteurs
-   * Sécurité: Retourne uniquement _id, nom, prénom, email, tel
-   */
   async getAllVisiteurs(req: express.Request, res: express.Response): Promise<void> {
     try {
       const visiteurs = await Visiteur.find()
@@ -108,10 +96,6 @@ export class VisiteurController {
     }
   }
 
-  /**
-   * Récupère un visiteur par son ID
-   * Sécurité: Retourne uniquement _id, nom, prénom, email, tel
-   */
   async getVisiteurById(req: express.Request, res: express.Response): Promise<void> {
     try {
       const { id } = req.params;
@@ -139,16 +123,10 @@ export class VisiteurController {
     }
   }
 
-  /**
-   * Crée un nouveau visiteur
-   */
   async createVisiteur(req: express.Request, res: express.Response): Promise<void> {
     try {
       const { nom, prenom, tel, email, date_embauche } = req.body;
 
-      
-
-      // Vérifier si l'email existe déjà
       const existingVisiteur = await Visiteur.findOne({ email });
       if (existingVisiteur) {
         res.status(400).json({
@@ -180,15 +158,11 @@ export class VisiteurController {
     }
   }
 
-  /**
-   * Met à jour un visiteur
-   */
   async updateVisiteur(req: express.Request, res: express.Response): Promise<void> {
     try {
       const { id } = req.params;
       const { nom, prenom, tel, email, date_embauche } = req.body;
 
-      // Vérifier si l'email existe déjà pour un autre visiteur
       if (email) {
         const existingVisiteur = await Visiteur.findOne({ email, _id: { $ne: id as string } });
         if (existingVisiteur) {
@@ -228,9 +202,6 @@ export class VisiteurController {
     }
   }
 
-  /**
-   * Supprime un visiteur
-   */
   async deleteVisiteur(req: express.Request, res: express.Response): Promise<void> {
     try {
       const { id } = req.params;
@@ -258,9 +229,6 @@ export class VisiteurController {
     }
   }
 
-  /**
-   * Recherche des visiteurs par nom ou prénom
-   */
   async searchVisiteurs(req: express.Request, res: express.Response): Promise<void> {
     try {
       const { q } = req.query;
@@ -295,10 +263,7 @@ export class VisiteurController {
     }
   }
 
-  /**
-   * Ajoute un praticien au portefeuille d'un visiteur
-   */
-  async addPraticienToPortefeuille(req: Request, res: Response): Promise<void> {
+  async addPraticienToPortefeuille(req: express.Request, res: express.Response): Promise<void> {
     try {
       const { visiteurId } = req.params;
       const { praticienId } = req.body;
@@ -321,9 +286,6 @@ export class VisiteurController {
     }
   }
 
-  /**
-   * Récupère le portefeuille de praticiens d'un visiteur
-   */
   async getPortefeuillePraticiens(req: express.Request, res: express.Response): Promise<void> {
     try {
       const { visiteurId } = req.params;

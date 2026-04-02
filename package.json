@@ -1,5 +1,5 @@
 {
-  "name": "GSB-api-rest-expressjs",
+  "name": "GSB-api-fix",
   "version": "1.0.0",
   "description": "Api pour l'application GSB mobile",
   "main": "dist/index.js",
@@ -16,7 +16,7 @@
     "typescript",
     "mongoose"
   ],
-  "author": "Merveille MAKOSI",
+  "author": "Matteo DE FAZIO",
   "license": "ISC",
   "type": "module",
   "dependencies": {
@@ -40,6 +40,7 @@
   },
   "devDependencies": {
     "@tsconfig/node22": "^22.0.5",
+    "@types/bcrypt": "^5.0.2",
     "@types/jest": "^30.0.0",
     "@types/jsonwebtoken": "^9.0.10",
     "jest": "^30.2.0",
