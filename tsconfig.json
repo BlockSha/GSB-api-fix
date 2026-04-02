@@ -18,8 +18,15 @@
     "moduleDetection": "force",
     "skipLibCheck": true
   },
+  "ts-node": {
+    "compilerOptions": {
+      "module": "CommonJS",
+      "verbatimModuleSyntax": false
+    }
+  },
   "include": [
-    "src/**/*"
+    "src/**/*",
+    "jest.config.ts"
   ],
   "exclude": [
     "node_modules",
