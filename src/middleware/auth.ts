@@ -20,7 +20,13 @@ export const authMiddleware = (
     }
 
     const token = authHeader.split(' ')[1];
-    const decodedToken = jwt.verify(token, process.env.JWT_SECRET as string, { algorithms: ['HS256'] }) as DecodedToken;
+    
+    if (!token) {
+      throw new Error('Token is missing.');
+    }
+
+    const secret = process.env.JWT_SECRET || '';
+    const decodedToken = jwt.verify(token, secret, { algorithms: ['HS256'] }) as unknown as DecodedToken;
 
     req.auth = { userId: decodedToken.userId, role: decodedToken.role };
     next();
