@@ -33,5 +33,5 @@ jobs:
         application_name: GSB
         environment_name: GSB-env
         version_label: ${{ github.sha }}-${{ github.run_number }}
-        region: eu-east-1
+        region: us-east-1
         deployment_package: deploy.zip
